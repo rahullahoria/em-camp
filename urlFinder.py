@@ -1,8 +1,11 @@
 #sudo apt-get install python-pip
 import mechanize #sudo pip install python-mechanize
-import re
+import re,os
 import urllib2
 import time
+import MySQLdb
+#db = MySQLdb.connect("localhost","root","redhat8892","compaining" )
+#cursor = db.cursor()
 
 ####################################
 def getUrls(page):
@@ -11,8 +14,17 @@ def getUrls(page):
 
 
 def savePage( url, level ):
+	db = MySQLdb.connect("localhost","root","redhat8892","compaining" )
+	cursor = db.cursor()
+	cursor.execute('''SELECT * FROM urls WHERE url = (%s)''',(url) )
+	numRows = cursor.rowcount
+	if numRows > 0 :
+		print "duplicate url"
+		return
+	#url presnt in db terminate
 	print level
-	if(level==3):
+	if(level>=1):
+		print "killing next level"
 		return
 	headers = {'USER-Agent':'crawltaosof'}
 	req = urllib2.Request(url, None,headers)
@@ -21,19 +33,23 @@ def savePage( url, level ):
 		print pageObj.info().getheader('Content-Type')
 		if "text/html" in pageObj.info().getheader('Content-Type'):
 			page = pageObj.read()
+			fileName = os.path.dirname(os.path.realpath(__file__))+"/crowl/"+str(time.time())+"_"+url.split("/")[2]+".html"
+			cursor.execute('''INSERT INTO urls(url, filename) VALUES (%s, %s)''', (url, fileName))
+			db.commit()
+			f = open(fileName,"w") #opens file with name of "test.txt"
+			f.write(page)
+			f.close()
 			ts = getUrls(page)
 			for t in ts:
 				for i in range(0,3):
 					savePage( t, level+i )
             #print page
-			f = open("crowl/"+str(time.time())+"_"+url.split("/")[2]+".html","w") #opens file with name of "test.txt"
-			f.write(page)
-			f.close()
 			return 1
 	except Exception, err:
 		print Exception, err
 		return 0
 	return 0
+	db.close()
 
 
 def uniqueListConc(first_list,second_list):
