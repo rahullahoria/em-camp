@@ -23,7 +23,7 @@ def savePage( url, level ):
 		return
 	#url presnt in db terminate
 	print level
-	if(level>=1):
+	if(level>=3):
 		print "killing next level"
 		return
 	headers = {'USER-Agent':'crawltaosof'}
@@ -41,7 +41,7 @@ def savePage( url, level ):
 			f.close()
 			ts = getUrls(page)
 			for t in ts:
-				for i in range(0,3):
+				for i in range(0,5):
 					savePage( t, level+i )
             #print page
 			return 1
@@ -76,7 +76,7 @@ def getGSLinks():
 	counter = 0
 	global allLinks
 
-	for i in range(0,1):
+	for i in range(0,3):
 		google_url = br.open("https://www.google.co.in/search?q=" + qe + "&amp;amp;start=" + str(counter))
 		search_keyword = google_url.read()
 		o = re.findall("(?P<url>https?://[^\s\"<]+)", search_keyword)

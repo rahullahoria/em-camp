@@ -14,8 +14,12 @@ files = cursor.fetchall()
 print files
 
 def getEmails(fileName):
-	with open(fileName, 'r') as myfile:
-		str = myfile.read().replace('\n', '')
+	try:
+		with open(fileName, 'r') as myfile:
+			str = myfile.read().replace('\n', '')
+	except:
+		print "not found"
+		str = "purple <alice@google.com, blah monkey bob@abc blah dishw"
 	#print str
 
 	#str = 'purple \"<alice@google.com\", blah monkey bob@abc blah dishwasher'
